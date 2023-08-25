@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Diagnosis Form</title>
+<style>
+    .container {
+        max-width: 800px;
+        margin: auto;
+        padding: 15px;
+        background-color: #f5f5f5;
+        border-radius: 10px;
+    }
+    .section {
+        display: none;
+        margin-bottom: 20px;
+    }
+    label, input, button {
+        margin-bottom: 10px;
+        width: 100%;
+        padding: 5px;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+    button {
+        cursor: pointer;
+        background-color: #007BFF;
+        border: none;
+        color: #ffffff;
+        padding: 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        transition-duration: 0.4s;
+        border-radius: 5px;
+    }
+    button:hover {
+        background-color: #0056b3;
+        color: white;
+    }
+    .road {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  background-color: #ffffff;
+  overflow: hidden;
+  display: none;
+}
+
+#car {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  width: 50%; /* Car width, adjust as needed */
+  animation: rotate 5s linear infinite; /* Rotation Animation */
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+</style>
+
+</head>
+<body>
+    <div class="road" id="road">
+        <img class="car" id="car" src="{{ url_for('static', filename='car.png') }}" alt="Car">
+      </div>      
+<div class="container mt-5" id="outerform">
+    <h1 class="text-center mb-5">Car Diagnosis Form</h1>
+    <form id="diagnosisForm">
+        <div id="section1" class="section">
+            <h2>Basic Information About the Car</h2>
+            <label for="make">Make:</label>
+            <input type="text" id="make" name="make" required><br>
+            <label for="model">Model:</label>
+            <input type="text" id="model" name="model" required><br>
+            <label for="year">Year:</label>
+            <input type="number" id="year" name="year" required><br>
+            <label for="mileage">Mileage:</label>
+            <input type="number" id="mileage" name="mileage"><br>
+            <button type="button" onclick="showSection(2)">Advanced</button>
+        </div>
+        <div id="section2" class="section">
+            <h2>Symptoms and Observations</h2>
+                        <label for="noise">Any unusual noises?</label>
+            <input type="text" id="noise" name="noise"><br>
+            <label for="smell">Any unusual smells?</label>
+            <input type="text" id="smell" name="smell"><br>
+            <label for="warningLights">Any warning lights on the dashboard?</label>
+            <input type="text" id="warningLights" name="warningLights"><br>
+            <label for="performanceIssues">Any changes in performance?</label>
+            <input type="text" id="performanceIssues" name="performanceIssues"><br>
+            <label for="drivingFeel">Any changes in how the car feels when driving?</label>
+            <input type="text" id="drivingFeel" name="drivingFeel"><br>
+            <label for="startingIssues">Any trouble starting the car?</label>
+            <input type="text" id="startingIssues" name="startingIssues"><br>
+            <label for="heatingCooling">Any issues with the car's heating or cooling systems?</label>
+            <input type="text" id="heatingCooling" name="heatingCooling"><br>
+            <button type="button" onclick="showSection(3)">Move Advanced</button>
+        </div>
+	<div id="section3" class="section">
+                    <h2>Specific Areas to Explore</h2>
+            <label for="engine">Engine:</label>
+            <input type="text" id="engine" name="engine"><br>
+            <label for="transmission">Transmission:</label>
+            <input type="text" id="transmission" name="transmission"><br>
+            <label for="brakes">Brakes:</label>
+            <input type="text" id="brakes" name="brakes"><br>
+            <label for="suspension">Suspension:</label>
+            <input type="text" id="suspension" name="suspension"><br>
+            <label for="electricalSystem">Electrical System:</label>
+            <input type="text" id="electricalSystem" name="electricalSystem"><br>
+            <label for="exhaustSystem">Exhaust System:</label>
+            <input type="text" id="exhaustSystem" name="exhaustSystem"><br>
+	</div>
+    <div id="finalSection">
+        <button type="submit">Submit</button>
+    </div>
+    </form>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('.section').hide(); // Hide all sections
+        $('#section1').show(); // Show the first section
+    });
+
+    function showSection(sectionNumber) {
+        var sectionToToggle = $('#section' + sectionNumber);
+        sectionToToggle.toggle(); // Toggle the selected section
+    }
+</script>
+<script>
+$('#diagnosisForm').submit(async function(e) {
+    e.preventDefault();
+    var formData = new FormData(this);
+    
+    // Show loading GIF
+    document.getElementById('road').style.display = 'block';
+    document.getElementById('outerform').style.display = 'none';
+    
+
+    // Display loading indicator (you can design it as you wish)
+    $('#loading').show();
+
+    try {
+        const response = await fetch('/submit', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error('An error occurred. Please try again.');
+        }
+
+        const blob = await response.blob();
+        const contentDisposition = response.headers.get('Content-Disposition');
+        let filename = '';
+        
+        if (contentDisposition) {
+            const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(contentDisposition);
+            if (matches && matches[1]) {
+                let filename = matches[1].replace(/['"]/g, '');
+                
+                // Prepend "DIAGNOSTIC_" to the filename
+                filename = 'DIAGNOSTIC_' + filename;
+
+                // Append a timestamp to the filename
+                const timestamp = new Date().toISOString().replace(/[:\-]/g, '').replace('T', '_').replace(/\..+/, '');
+                filename += '_' + timestamp;
+
+                // Now filename contains the modified string
+            }
+        }
+
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            // IE workaround
+            window.navigator.msSaveOrOpenBlob(blob, filename);
+        } else {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => { URL.revokeObjectURL(url); }, 100);
+        }
+
+        // Hide loading indicator
+        $('#loading').hide();
+
+    } catch (error) {
+        // Hide loading indicator
+        $('#loading').hide();
+
+        // Display the error message
+        alert(error.message);
+    } finally {
+        // Hide loading GIF
+        document.getElementById('road').style.display = 'none';
+        document.getElementById('outerform').style.display = 'block';
+    }
+});
+
+
+</script>
+</body>
+</html>

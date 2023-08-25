@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Issues</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        p {
+            color: #555;
+            line-height: 1.6;
+        }
+        a {
+            color: #1e90ff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 15px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .reason {
+            margin: 15px 0;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vehicle Diagnostic Information</h1>
+        <p><strong>Year:</strong> {{ diagnostic.user_vehicle_info.year }}</p>
+        <p><strong>Make:</strong> {{ diagnostic.user_vehicle_info.make }}</p>
+        <p><strong>Model:</strong> {{ diagnostic.user_vehicle_info.model }}</p>
+        <p><strong>Mileage:</strong> {{ diagnostic.user_vehicle_info.mileage }}</p>
+        <p><strong>Parts Link:</strong> <a href="{{ diagnostic.parts_link }}">Here</a></p>
+        <p><strong>Car Manuals Link:</strong> <a href="{{ diagnostic.car_manuals_link }}">Here</a></p>
+        <h2>Suggested Reasons:</h2>
+        {% for reason in diagnostic.suggested_reasons %}
+            <div class="reason">
+                <h3>{{ reason.reason }}</h3>
+                <p>{{ reason.explanation }}</p>
+                <p><strong>YouTube:</strong> <a href="{{ reason.helpful_links.YouTube_Search }}">Search</a></p>
+                <p><strong>Google:</strong> <a href="{{ reason.helpful_links.Google_Search }}">Search</a></p>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
